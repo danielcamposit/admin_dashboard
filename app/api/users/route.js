@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createUser, getAllUsers } from "../../../src/lib/users-repository";
-import { getSessionFromCookieStore } from "../../../src/lib/session";
+import {
+  getSessionFromCookieStore,
+  isAdminSession,
+} from "../../../src/lib/session";
 
 export const runtime = "nodejs";
 
 function unauthorizedResponse() {
   return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+}
+
+function forbiddenResponse() {
+  return NextResponse.json({ error: "Admin access required." }, { status: 403 });
 }
 
 export async function GET() {
@@ -34,6 +41,10 @@ export async function POST(request) {
 
   if (!session) {
     return unauthorizedResponse();
+  }
+
+  if (!isAdminSession(session)) {
+    return forbiddenResponse();
   }
 
   try {

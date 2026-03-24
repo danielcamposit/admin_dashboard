@@ -11,5 +11,5 @@ export default async function ProtectedLayout({ children }) {
     redirect("/");
   }
 
-  return <ProtectedShell>{children}</ProtectedShell>;
+  return <ProtectedShell session={session}>{children}</ProtectedShell>;
 }

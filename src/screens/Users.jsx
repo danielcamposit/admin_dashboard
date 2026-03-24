@@ -46,7 +46,7 @@ function Users() {
       setEditingUser(null);
       setError("");
     } catch (saveError) {
-      setError(saveError.message);
+      setError(saveError.message || "Failed to update user.");
     }
   }
 
@@ -59,7 +59,7 @@ function Users() {
       setUsers((currentUsers) => currentUsers.filter((user) => user.id !== id));
       setError("");
     } catch (deleteError) {
-      setError(deleteError.message);
+      setError(deleteError.message || "Failed to delete user.");
     }
   }
 
@@ -70,7 +70,7 @@ function Users() {
       setNewUser(null);
       setError("");
     } catch (createError) {
-      setError(createError.message);
+      setError(createError.message || "Failed to create user.");
     }
   }
 

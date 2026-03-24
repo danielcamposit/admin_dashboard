@@ -4,12 +4,19 @@ import {
   deleteUserById,
   updateUserById,
 } from "../../../../src/lib/users-repository";
-import { getSessionFromCookieStore } from "../../../../src/lib/session";
+import {
+  getSessionFromCookieStore,
+  isAdminSession,
+} from "../../../../src/lib/session";
 
 export const runtime = "nodejs";
 
 function unauthorizedResponse() {
   return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+}
+
+function forbiddenResponse() {
+  return NextResponse.json({ error: "Admin access required." }, { status: 403 });
 }
 
 export async function PUT(request, { params }) {
@@ -18,6 +25,10 @@ export async function PUT(request, { params }) {
 
   if (!session) {
     return unauthorizedResponse();
+  }
+
+  if (!isAdminSession(session)) {
+    return forbiddenResponse();
   }
 
   try {
@@ -44,6 +55,10 @@ export async function DELETE(_request, { params }) {
 
   if (!session) {
     return unauthorizedResponse();
+  }
+
+  if (!isAdminSession(session)) {
+    return forbiddenResponse();
   }
 
   try {

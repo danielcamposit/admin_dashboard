@@ -14,10 +14,13 @@ function sign(payload) {
     .digest("base64url");
 }
 
-export function createSessionToken({ email }) {
+export function createSessionToken({ id, email, name, role }) {
   const payload = Buffer.from(
     JSON.stringify({
+      id,
+      name,
       email,
+      role,
       exp: Date.now() + SESSION_DURATION_MS,
     })
   ).toString("base64url");
@@ -60,4 +63,8 @@ export function verifySessionToken(token) {
 export function getSessionFromCookieStore(cookieStore) {
   const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
   return verifySessionToken(token);
+}
+
+export function isAdminSession(session) {
+  return session?.role === "admin";
 }

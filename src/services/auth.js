@@ -20,9 +20,29 @@ export async function login(email, password) {
   return parseResponse(response);
 }
 
+export async function register(name, email, password) {
+  const response = await fetch("/api/auth/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name, email, password }),
+  });
+
+  return parseResponse(response);
+}
+
 export async function logout() {
   const response = await fetch("/api/auth/logout", {
     method: "POST",
+  });
+
+  return parseResponse(response);
+}
+
+export async function deleteOwnAccount() {
+  const response = await fetch("/api/auth/account", {
+    method: "DELETE",
   });
 
   return parseResponse(response);

@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-function Sidebar() {
+function Sidebar({ session }) {
   const pathname = usePathname();
+  const isAdmin = session?.role === "admin";
 
   function getItemClass(path, isPrimary = false) {
     const isActive = pathname === path;
@@ -25,11 +26,13 @@ function Sidebar() {
           </Link>
         </li>
 
-        <li>
-          <Link href="/users" className={getItemClass("/users")}>
-            Users
-          </Link>
-        </li>
+        {isAdmin && (
+          <li>
+            <Link href="/users" className={getItemClass("/users")}>
+              Users
+            </Link>
+          </li>
+        )}
 
         <li>
           <Link href="/settings" className={getItemClass("/settings")}>
@@ -38,8 +41,9 @@ function Sidebar() {
         </li>
       </ul>
 
-      <div className="border-t border-gray-700 p-4 text-sm text-gray-400">
-        v1.0
+      <div className="mt-6 border-t border-gray-700 p-4 text-sm text-gray-400">
+        <p className="font-medium text-white">{session?.name || "User"}</p>
+        <p className="capitalize">{session?.role || "user"}</p>
       </div>
     </div>
   );

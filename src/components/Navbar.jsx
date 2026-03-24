@@ -4,7 +4,7 @@ import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { logout } from "../services/auth";
 
-function Navbar() {
+function Navbar({ session }) {
   const pathname = usePathname();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +29,12 @@ function Navbar() {
 
   return (
     <div className="flex items-center justify-between bg-white p-4 shadow dark:bg-gray-800 dark:text-white">
-      <h1 className="font-bold">{titles[pathname] || "Admin Panel"}</h1>
+      <div>
+        <h1 className="font-bold">{titles[pathname] || "Admin Panel"}</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {session?.email}
+        </p>
+      </div>
 
       <button
         onClick={handleLogout}

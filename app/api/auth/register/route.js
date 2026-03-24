@@ -3,16 +3,15 @@ import {
   createSessionToken,
   SESSION_COOKIE_NAME,
 } from "../../../../src/lib/session";
-import { authenticateUser } from "../../../../src/lib/auth-users-repository";
+import { registerAuthUser } from "../../../../src/lib/auth-users-repository";
 
 export const runtime = "nodejs";
 
 export async function POST(request) {
   try {
-    const { email, password } = await request.json();
-    const user = await authenticateUser(email, password);
+    const user = await registerAuthUser(await request.json());
     const token = createSessionToken(user);
-    const response = NextResponse.json({ ok: true, user });
+    const response = NextResponse.json(user, { status: 201 });
 
     response.cookies.set(SESSION_COOKIE_NAME, token, {
       httpOnly: true,
@@ -24,10 +23,10 @@ export async function POST(request) {
 
     return response;
   } catch (error) {
-    const status = error.message === "Invalid credentials." ? 401 : 400;
+    const status = error.message === "Email already exists." ? 409 : 400;
 
     return NextResponse.json(
-      { error: error.message || "Login failed." },
+      { error: error.message || "Failed to register user." },
       { status }
     );
   }
