@@ -3,7 +3,10 @@ import {
   getSessionFromCookieStore,
   SESSION_COOKIE_NAME,
 } from "../../../../src/lib/session";
-import { deleteAuthUserById } from "../../../../src/lib/auth-users-repository";
+import {
+  deleteAuthUserById,
+  updateAuthUserPassword,
+} from "../../../../src/lib/auth-users-repository";
 import { cookies } from "next/headers";
 
 export const runtime = "nodejs";
@@ -38,6 +41,35 @@ export async function DELETE() {
 
     return NextResponse.json(
       { error: error.message || "Failed to delete account." },
+      { status }
+    );
+  }
+}
+
+export async function PATCH(request) {
+  const cookieStore = await cookies();
+  const session = getSessionFromCookieStore(cookieStore);
+
+  if (!session) {
+    return unauthorizedResponse();
+  }
+
+  try {
+    const { currentPassword, newPassword } = await request.json();
+
+    await updateAuthUserPassword(session.id, currentPassword, newPassword);
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    const status =
+      error.message === "User not found."
+        ? 404
+        : error.message === "Current password is incorrect."
+          ? 401
+          : 400;
+
+    return NextResponse.json(
+      { error: error.message || "Failed to update password." },
       { status }
     );
   }

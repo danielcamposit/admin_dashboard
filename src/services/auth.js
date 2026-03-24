@@ -47,3 +47,15 @@ export async function deleteOwnAccount() {
 
   return parseResponse(response);
 }
+
+export async function updateOwnPassword(currentPassword, newPassword) {
+  const response = await fetch("/api/auth/account", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+
+  return parseResponse(response);
+}

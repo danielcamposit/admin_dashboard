@@ -77,8 +77,7 @@ export async function registerAuthUser(user) {
   const { name, email, password } = normalizeAuthUserInput(user);
   const passwordHash = hashPassword(password);
   await ensureAuthUsersTable();
-  const countResult = await sql`SELECT COUNT(*)::int AS count FROM auth_users`;
-  const role = (countResult[0]?.count || 0) === 0 ? "admin" : "user";
+  const role = "user";
 
   try {
     const rows = await sql`
@@ -160,4 +159,43 @@ export async function deleteAuthUserById(id) {
       `;
     }
   }
+}
+
+export async function updateAuthUserPassword(id, currentPassword, newPassword) {
+  const sql = getSql();
+
+  if (!currentPassword || !newPassword) {
+    throw new Error("Current password and new password are required.");
+  }
+
+  await ensureAuthUsersTable();
+
+  const rows = await sql`
+    SELECT id, password_hash
+    FROM auth_users
+    WHERE id = ${id}
+    LIMIT 1
+  `;
+
+  const user = rows[0];
+
+  if (!user) {
+    throw new Error("User not found.");
+  }
+
+  if (!verifyPassword(currentPassword, user.password_hash)) {
+    throw new Error("Current password is incorrect.");
+  }
+
+  if (currentPassword === newPassword) {
+    throw new Error("New password must be different from the current password.");
+  }
+
+  const passwordHash = hashPassword(newPassword);
+
+  await sql`
+    UPDATE auth_users
+    SET password_hash = ${passwordHash}
+    WHERE id = ${id}
+  `;
 }
